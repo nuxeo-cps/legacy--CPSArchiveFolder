@@ -5,8 +5,12 @@
 <div class="description"> <span
   tal:content="here/Description">description</span>
 </div>
-  <tal:block tal:replace="structure here/index.html">
+  <tal:block tal:define="ids here/objectIds;
+                         ids_html python:[x for x in ids if x.endswith('.html')];
+                         page python:len(ids_html) == 1 and ids_html[0]+'.raw' or 'index.html.raw'"> 
+  <tal:block tal:replace="structure python:here[page]">
   </tal:block>
+  </tal:block> 
 </metal:block>
 </metal:block>
 </metal:block>

@@ -29,19 +29,6 @@ from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 
 _marker = []
 
-wrap_template = """<metal:block define-macro="folder_view">
-<metal:block use-macro="here/main_template/macros/master">
-<metal:block fill-slot="main">
-<h1 tal:content="here/title_or_id">Page Title</h1>
-<div class="description"><span
-  tal:content="here/Description">description</span>
-</div>
-%s
-</metal:block>
-</metal:block>
-</metal:block>
-"""
-
 factory_type_information = ({ 
     'id': 'CPSArchiveFolder',
     'meta_type': 'CPSArchiveFolder',
@@ -133,6 +120,11 @@ class CPSArchiveFolder(CPSBaseDocument):
 
     def _getOb(self, id, default=_marker):
         if self._file:
+            raw = 0
+            if id.endswith(".html.raw"):
+                id = id[:-4]
+                raw = 1
+
             zf = ZipFile(StringIO(str(self._file)))
             try:
                 data = zf.read(id)
@@ -141,14 +133,14 @@ class CPSArchiveFolder(CPSBaseDocument):
                     raise AttributeError, id
                 else:
                     return default
-            # Wrap into main template if not index.html
-            # A bit ugly for now, but ok for testing purposes
-            # XXX Direct call to ZopePageTemplate class ; is this OK ?
-            if id.endswith(".html") and id != 'index.html':
-                data = wrap_template % data
-                return ZopePageTemplate(id='_zpt', text=data).__of__(self)
 
+            if id.endswith(".html") and not raw:
+                # return self.wrap_template(id=id)
+                return self.wrap_template(id=id).__of__(self)
+                # Do not know if __of__ is needed here
+                
             return File(id, '', data).__of__(self)
+            
         elif default is _marker:
             raise AttributeError, id
         else:

@@ -1,0 +1,11 @@
+<metal:block define-macro="folder_view">
+<metal:block use-macro="here/main_template/macros/master">
+<metal:block fill-slot="main">
+<h1 tal:content="here/title_or_id">Page Title</h1>
+<div class="description"><span
+  tal:content="here/Description">description</span>
+</div>
+<tal:block replace="structure python:here[options['id']+'.raw']" />
+</metal:block>
+</metal:block>
+</metal:block>
