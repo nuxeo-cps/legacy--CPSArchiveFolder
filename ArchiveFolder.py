@@ -34,7 +34,7 @@ factory_type_information = ({
     'id': 'CPSArchiveFolder',
     'meta_type': 'CPSArchiveFolder',
     'description': "portal_type_ArchiveFolder_description",
-    'icon': '',
+    'icon': 'folder_icon.gif',
     'title': "portal_type_ArchiveFolder_title",
     'product': 'CPSArchiveFolder',
     'factory': 'addCPSArchiveFolder',
