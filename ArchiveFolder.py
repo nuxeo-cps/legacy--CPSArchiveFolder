@@ -153,7 +153,7 @@ class CPSArchiveFolder(CPSBaseDocument):
                 return StringWrapperAsObject(self.archivefolder_wrap_template(id=id)).__of__(self)
             
             else:
-                return File(id, '', data).__of__(self)
+                return StringWrapperAsObject(data).__of__(self)
             
         elif default is _marker:
             raise AttributeError, id
