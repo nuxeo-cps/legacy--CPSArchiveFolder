@@ -44,9 +44,11 @@ class Test(CPSArchiveFolderTestCase.CPSArchiveFolderTestCase):
 
         file = obj['coverage.py']
         self.assert_(file.meta_type == 'File')
+        self.assert_(file.content_type == 'text/x-python')
 
         file = obj['test.html']
         self.assert_(file.meta_type == 'File')
+        self.assert_(file.content_type == 'text/html')
 
         #obj.REQUEST['PARENTS'] = [self.portal.aq_parent]
         #print obj.REQUEST.traverse("/portal/workspaces/af")
