@@ -1,3 +1,4 @@
+<tal:block tal:condition="not:here/new_window">
 <metal:block define-macro="folder_view">
 <metal:block use-macro="here/main_template/macros/master">
 <metal:block fill-slot="main">
@@ -14,3 +15,11 @@
 </metal:block>
 </metal:block>
 </metal:block>
+</tal:block>
+ <tal:block tal:condition="here/new_window"
+            tal:define="ids here/objectIds;
+                         ids_html python:[x for x in ids if x.endswith('.html')];
+                         page python:len(ids_html) == 1 and ids_html[0]+'.raw' or 'index.html.raw'"> 
+ <tal:block tal:replace="structure python:here[page]">
+ </tal:block>
+</tal:block> 

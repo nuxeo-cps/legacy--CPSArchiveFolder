@@ -135,7 +135,7 @@ class CPSArchiveFolder(CPSBaseDocument):
                 else:
                     return default
 
-            if id.endswith(".html") and not raw:
+            if id.endswith(".html") and not raw and not self.new_window:
                 return File(id, '', file=self.archivefolder_wrap_template(id=id)).__of__(self)
             
             else:
