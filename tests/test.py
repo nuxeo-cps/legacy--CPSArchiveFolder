@@ -31,14 +31,35 @@ class Test(CPSArchiveFolderTestCase.CPSArchiveFolderTestCase):
 
     def testSubObjects(self):
         obj = ArchiveFolder.CPSArchiveFolder('af', file=open("test.zip"))
+        self.assert_(obj._file)
+
         ids = obj.objectIds()
+
         self.assert_("coverage.py" in ids)
+        self.assert_("test.html" in ids)
         self.assert_(len(obj.objectValues()) > 0)
         self.assert_(len(obj.objectItems()) > 0)
 
         file = obj['coverage.py']
         self.assert_(file.meta_type == "File")
 
+        file = obj['test.html']
+        self.assert_(file.meta_type == "Page Template")
+
+        self.assertEquals(obj._getOb("no such id", None), None)
+        self.assertRaises(AttributeError, obj._getOb, "no such id")
+
+        # Delete file
+        obj.edit(zip_file=None, zip_file_change='delete')
+        self.assertEquals(obj._file, None)
+        self.assertEquals(len(obj.objectIds()), 0)
+        self.assertRaises(AttributeError, obj._getOb, "no such id")
+        self.assertEquals(obj._getOb("no such id", None), None)
+
+        # Upload file again
+        obj.edit(zip_file=open("test.zip"))
+        self.assert_(obj._file)
+        self.assert_(len(obj.objectIds()))
 
 def test_suite():
     suite = unittest.TestSuite()

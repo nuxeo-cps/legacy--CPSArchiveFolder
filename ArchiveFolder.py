@@ -103,6 +103,7 @@ class CPSArchiveFolder(CPSBaseDocument):
                 self._update(zip_file)
         elif zip_file_change == 'delete':
             self._file = None
+            self._object_ids = ()
         CPSBaseDocument.edit(self, **kw)
 
     def _update(self, file):
@@ -133,7 +134,13 @@ class CPSArchiveFolder(CPSBaseDocument):
     def _getOb(self, id, default=_marker):
         if self._file:
             zf = ZipFile(StringIO(str(self._file)))
-            data = zf.read(id)
+            try:
+                data = zf.read(id)
+            except KeyError, id:
+                if default is _marker:
+                    raise AttributeError, id
+                else:
+                    return default
             # Wrap into main template if not index.html
             # A bit ugly for now, but ok for testing purposes
             # XXX Direct call to ZopePageTemplate class ; is this OK ?
@@ -144,5 +151,6 @@ class CPSArchiveFolder(CPSBaseDocument):
             return File(id, '', data).__of__(self)
         elif default is _marker:
             raise AttributeError, id
-        return default
+        else:
+            return default
 
