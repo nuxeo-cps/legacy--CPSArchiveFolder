@@ -51,6 +51,8 @@ factory_type_information = ({
         'action': 'archivefolder_edit_form',
         'permissions': (ModifyPortalContent,),
     },),
+
+    'cps_is_searchable': 1,
 },)
 
 def addCPSArchiveFolder(self, id, **kw):
