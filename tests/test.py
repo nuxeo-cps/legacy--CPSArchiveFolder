@@ -38,17 +38,18 @@ class Test(CPSArchiveFolderTestCase.CPSArchiveFolderTestCase):
 
         ids = obj.objectIds()
         self.assert_("coverage.py" in ids)
-        self.assert_("test.html" in ids)
+        self.assert_("test.html.raw" in ids)
+        self.assert_(obj["test.html"])
         self.assert_(len(obj.objectValues()) > 0)
         self.assert_(len(obj.objectItems()) > 0)
 
         file = obj['coverage.py']
-        self.assert_(file.meta_type == 'File')
-        self.assert_(file.content_type == 'text/x-python')
+        self.assertEquals(file.meta_type, 'File')
+        self.assertEquals(file.content_type, 'text/x-python')
 
         file = obj['test.html']
-        self.assert_(file.meta_type == 'File')
-        self.assert_(file.content_type == 'text/html')
+        self.assertEquals(file.meta_type, 'FileEncapsulator')
+        #self.assertEquals(file.content_type, 'text/html')
 
         #obj.REQUEST['PARENTS'] = [self.portal.aq_parent]
         #print obj.REQUEST.traverse("/portal/workspaces/af")
@@ -85,7 +86,7 @@ class Test(CPSArchiveFolderTestCase.CPSArchiveFolderTestCase):
             assert af.unrestrictedTraverse(path)
 
         folder = af.CVS
-        self.assertEquals(folder.meta_type, "Folder")
+        self.assertEquals(folder.meta_type, "EncapsulationFolder")
 
         file = af.CVS.Root
         self.assertEquals(file.meta_type, "File")
