@@ -96,13 +96,13 @@ class CPSArchiveFolder(CPSBaseDocument):
         self._update(file)
         CPSBaseDocument.__init__(self, id, **kw)
 
-    def edit(self, fichier=None, fichier_change=None, **kw):
+    def edit(self, zip_file=None, zip_file_change=None, **kw):
         """Edit the object props."""
-        if fichier_change in ('change', None):
-            if fichier is not None:
-                self._update(fichier)
-        elif fichier_change == 'delete':
-            self.fichier = None
+        if zip_file_change in ('change', None):
+            if zip_file is not None:
+                self._update(zip_file)
+        elif zip_file_change == 'delete':
+            self._file = None
         CPSBaseDocument.edit(self, **kw)
 
     def _update(self, file):

@@ -29,7 +29,7 @@
       <tr valign="top">
         <th align="right">Fichier Zip</th>
         <td colspan="3">
-          <input type="file" name="fichier">
+          <input type="file" name="zip_file">
         </td>
       </tr>
 
