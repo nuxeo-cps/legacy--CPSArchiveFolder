@@ -22,11 +22,10 @@ from Products.CMFCore.CMFCorePermissions import View, \
 import Acquisition
 from Products.CPSCore.CPSBase import CPSBaseDocument, CPSBase_adder
 from OFS.Image import File
+from OFS.Folder import Folder
 from zLOG import LOG, DEBUG
 from StringIO import StringIO
-from types import StringType
 from zipfile import ZipFile
-from Products.PageTemplates.ZopePageTemplate import ZopePageTemplate
 
 _marker = []
 
@@ -51,7 +50,6 @@ factory_type_information = ({
         'action': 'archivefolder_edit_form',
         'permissions': (ModifyPortalContent,),
     },),
-
     'cps_is_searchable': 1,
 },)
 
@@ -62,7 +60,7 @@ def addCPSArchiveFolder(self, id, **kw):
     obj = CPSArchiveFolder(id, **kw)
     CPSBase_adder(self, obj)
 
-class CPSArchiveFolder(CPSBaseDocument):
+class CPSArchiveFolder(CPSBaseDocument, Folder):
     """
     Archive (ZIP, TGZ) folder
     """
@@ -71,80 +69,66 @@ class CPSArchiveFolder(CPSBaseDocument):
     allow_discussion = 0
     security = ClassSecurityInfo()
 
-    _properties = CPSBaseDocument._properties +\
+    new_window = 0
+    _properties = CPSBaseDocument._properties + \
        ( {'id': 'new_window', 'type': 'boolean', 'mode': 'w',
           'label': 'Open in new window'},
        )
- 
-    new_window = 0
 
     _file = None
-    _object_ids = ()
 
     def __init__(self, id, file='', **kw):
         """Constructor"""
         self._update(file)
         CPSBaseDocument.__init__(self, id, **kw)
 
+    # XXX: what do we need here ?
+    def index_html(self):
+        """Default view"""
+        if hasattr(self, "index.html"):
+            # FIXME: ???
+            #print getattr(self, "index.html")()
+            #return getattr(self, "index.html")()
+            pass
+        else:
+            # FIXME: ???
+            pass
+
     def edit(self, zip_file=None, zip_file_change=None, **kw):
-        """Edit the object props."""
+        """Edit the object properties."""
         if zip_file_change in ('change', None):
             if zip_file is not None:
                 self._update(zip_file)
         elif zip_file_change == 'delete':
             self._file = None
-            self._object_ids = ()
+            self.manage_delObjects(self.objectIds())
         CPSBaseDocument.edit(self, **kw)
 
     def _update(self, file):
+        """Update content from zip file."""
         if not file:
             return
-
         self._file = File('zipdata', '', file=file)
-        zf = ZipFile(StringIO(str(self._file)))
-        infolist = zf.infolist()
-        ids = []
+        zipfile = ZipFile(StringIO(str(self._file)))
+        infolist = zipfile.infolist()
         for info in infolist:
-            if not info.filename.count('/'):
-                ids.append(info.filename)
-        self._object_ids = tuple(ids)
+            path = info.filename
+            # Skip folders
+            if path[-1] == '/':
+                continue
+            data = zipfile.read(path)
+            self._install(path, data)
 
-    def __getitem__(self, id):
-        return self._getOb(id)
-
-    def objectIds(self, spec=None):
-        return self._object_ids
-
-    def objectValues(self, spec=None):
-        return [ self._getOb(id) for id in self._object_ids ]
-
-    def objectItems(self, spec=None):
-        return [ (id, self._getOb(id)) for id in self._object_ids ]
-
-    def _getOb(self, id, default=_marker):
-        if self._file:
-            raw = 0
-            if id.endswith(".html.raw"):
-                id = id[:-4]
-                raw = 1
-
-            zf = ZipFile(StringIO(str(self._file)))
-            try:
-                data = zf.read(id)
-            except KeyError, id:
-                if default is _marker:
-                    raise AttributeError, id
-                else:
-                    return default
-
-            if id.endswith(".html") and not raw and not self.new_window:
-                return File(id, '', file=self.archivefolder_wrap_template(id=id)).__of__(self)
-            
-            else:
-                return File(id, '', file=data).__of__(self)
-            
-        elif default is _marker:
-            raise AttributeError, id
-        else:
-            return default
+    def _install(self, path, data):
+        """Install object (file) <path> with content <data>."""
+        l = path.split("/")
+        folder = self
+        for id in l[0:-1]:
+            if not hasattr(folder, id):
+                subfolder = Folder(id)
+                folder._setObject(id, subfolder)
+            folder = getattr(folder, id)
+        id = l[-1]
+        file = File(id, '', file=data)
+        folder._setObject(id, file)
 

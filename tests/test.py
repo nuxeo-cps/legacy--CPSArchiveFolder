@@ -1,7 +1,3 @@
-# TODO: 
-# - don't depend on getDocumentSchemas / getDocumentTypes but is there
-#   an API for that ?
-
 import os, sys
 if __name__ == '__main__':
     execfile(os.path.join(sys.path[0], 'framework.py'))
@@ -9,10 +5,7 @@ if __name__ == '__main__':
 import unittest
 from Testing import ZopeTestCase
 import CPSArchiveFolderTestCase
-
 from Products.CPSArchiveFolder import ArchiveFolder
-
-from types import StringType
 
 
 class Test(CPSArchiveFolderTestCase.CPSArchiveFolderTestCase):
@@ -40,11 +33,10 @@ class Test(CPSArchiveFolderTestCase.CPSArchiveFolderTestCase):
 
         dispatcher.addCPSArchiveFolder('af')
         obj = self.ws.af
-        obj.edit(zip_file=open("test.zip"))
+        obj.edit(zip_file=open("test_flat.zip"))
         self.assert_(obj._file)
 
         ids = obj.objectIds()
-
         self.assert_("coverage.py" in ids)
         self.assert_("test.html" in ids)
         self.assert_(len(obj.objectValues()) > 0)
@@ -55,6 +47,9 @@ class Test(CPSArchiveFolderTestCase.CPSArchiveFolderTestCase):
 
         file = obj['test.html']
         self.assert_(file.meta_type == 'File')
+
+        #obj.REQUEST['PARENTS'] = [self.portal.aq_parent]
+        #print obj.REQUEST.traverse("/portal/workspaces/af")
 
         self.assertEquals(obj._getOb("no such id", None), None)
         self.assertRaises(AttributeError, obj._getOb, "no such id")
@@ -67,7 +62,7 @@ class Test(CPSArchiveFolderTestCase.CPSArchiveFolderTestCase):
         self.assertEquals(obj._getOb("no such id", None), None)
 
         # Upload file again
-        obj.edit(zip_file=open("test.zip"))
+        obj.edit(zip_file=open("test_flat.zip"))
         self.assert_(obj._file)
         self.assert_(len(obj.objectIds()))
 
@@ -76,6 +71,32 @@ class Test(CPSArchiveFolderTestCase.CPSArchiveFolderTestCase):
         self.assert_(self.portal.archivefolder_edit_form)
         self.assert_(self.portal.archivefolder_view)
         self.assert_(self.portal.archivefolder_wrap_template)
+
+    # After "nested ZIP" refactoring
+    def testNested(self):
+        dispatcher = self.ws.manage_addProduct['CPSArchiveFolder']
+        dispatcher.addCPSArchiveFolder('af')
+        af = self.ws.af
+        af.edit(zip_file=open("test_nested.zip"))
+
+        for path in "test.py CVS CVS/Root CVS/Repository CVS/Entries".split():
+            assert af.unrestrictedTraverse(path)
+
+        folder = af.CVS
+        self.assertEquals(folder.meta_type, "Folder")
+
+        file = af.CVS.Root
+        self.assertEquals(file.meta_type, "File")
+        self.assertEquals(
+            file.index_html(file.REQUEST, file.REQUEST.RESPONSE).strip(), 
+            ":ext:fermigier@cvs.in.nuxeo.com:/home/cvs")
+
+        #self.portal.REQUEST['PARENTS'] = [self.portal.aq_parent]
+        #ob = self.portal.REQUEST.traverse("/portal/workspaces/af/CVS/Root")
+        #self.assertEquals(ob.aq_base, af.aq_base)
+        #self.assertEquals(ob().index_html().strip(), 
+        #                  ":ext:fermigier@cvs.in.nuxeo.com:/home/cvs")
+
 
 def test_suite():
     suite = unittest.TestSuite()
