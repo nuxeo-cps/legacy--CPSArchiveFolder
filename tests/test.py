@@ -27,10 +27,18 @@ class Test(CPSArchiveFolderTestCase.CPSArchiveFolderTestCase):
 
     def testInstanciationUsingZopeDispatcher(self):
         dispatcher = self.ws.manage_addProduct['CPSArchiveFolder']
-        obj = dispatcher.addCPSArchiveFolder('af')
+        dispatcher.addCPSArchiveFolder('af')
+        self.assert_(self.ws.af)
 
     def testSubObjects(self):
-        obj = ArchiveFolder.CPSArchiveFolder('af', file=open("test.zip"))
+        dispatcher = self.ws.manage_addProduct['CPSArchiveFolder']
+
+        # XXX: doesn't work ! Why ?
+        # dispatcher.addCPSArchiveFolder('af', file=open("test.zip"))
+
+        dispatcher.addCPSArchiveFolder('af')
+        obj = self.ws.af
+        obj.edit(zip_file=open("test.zip"))
         self.assert_(obj._file)
 
         ids = obj.objectIds()
@@ -60,6 +68,12 @@ class Test(CPSArchiveFolderTestCase.CPSArchiveFolderTestCase):
         obj.edit(zip_file=open("test.zip"))
         self.assert_(obj._file)
         self.assert_(len(obj.objectIds()))
+
+    def testSkins(self):
+        self.assert_(self.portal.archivefolder_edit)
+        self.assert_(self.portal.archivefolder_edit_form)
+        self.assert_(self.portal.archivefolder_view)
+        self.assert_(self.portal.wrap_template)
 
 def test_suite():
     suite = unittest.TestSuite()

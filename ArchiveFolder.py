@@ -135,8 +135,8 @@ class CPSArchiveFolder(CPSBaseDocument):
                     return default
 
             if id.endswith(".html") and not raw:
-                # return self.wrap_template(id=id)
-                return self.wrap_template(id=id).__of__(self)
+                return self.wrap_template(id=id)
+                #return self.wrap_template(id=id).__of__(self)
                 # Do not know if __of__ is needed here
                 
             return File(id, '', data).__of__(self)
