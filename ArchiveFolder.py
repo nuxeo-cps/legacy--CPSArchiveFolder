@@ -60,20 +60,6 @@ def addCPSArchiveFolder(self, id, **kw):
     obj = CPSArchiveFolder(id, **kw)
     CPSBase_adder(self, obj)
 
-
-class StringWrapperAsObject(Acquisition.Implicit):
-    
-    security = ClassSecurityInfo()
-    security.declareObjectPublic()
-
-    def __init__(self, s):
-        self.string = s
-
-    def index_html(self):
-        """ rendering of wrapper object, simply returns the string attr """
-        return self.string
-
-
 class CPSArchiveFolder(CPSBaseDocument):
     """
     Archive (ZIP, TGZ) folder
@@ -150,10 +136,10 @@ class CPSArchiveFolder(CPSBaseDocument):
                     return default
 
             if id.endswith(".html") and not raw:
-                return StringWrapperAsObject(self.archivefolder_wrap_template(id=id)).__of__(self)
+                return File(id, '', file=self.archivefolder_wrap_template(id=id)).__of__(self)
             
             else:
-                return StringWrapperAsObject(data).__of__(self)
+                return File(id, '', file=data).__of__(self)
             
         elif default is _marker:
             raise AttributeError, id
