@@ -19,6 +19,7 @@
 from AccessControl import ClassSecurityInfo
 from Products.CMFCore.CMFCorePermissions import View, \
      ModifyPortalContent
+import Acquisition
 from Products.CPSCore.CPSBase import CPSBaseDocument, CPSBase_adder
 from OFS.Image import File
 from zLOG import LOG, DEBUG
@@ -58,6 +59,20 @@ def addCPSArchiveFolder(self, id, **kw):
     """
     obj = CPSArchiveFolder(id, **kw)
     CPSBase_adder(self, obj)
+
+
+class StringWrapperAsObject(Acquisition.Implicit):
+    
+    security = ClassSecurityInfo()
+    security.declareObjectPublic()
+
+    def __init__(self, s):
+        self.string = s
+
+    def index_html(self):
+        """ rendering of wrapper object, simply returns the string attr """
+        return self.string
+
 
 class CPSArchiveFolder(CPSBaseDocument):
     """
@@ -135,9 +150,8 @@ class CPSArchiveFolder(CPSBaseDocument):
                     return default
 
             if id.endswith(".html") and not raw:
-                return self.wrap_template(id=id)
-                #return self.wrap_template(id=id).__of__(self)
-                # Do not know if __of__ is needed here
+                return StringWrapperAsObject(self.archivefolder_wrap_template(id=id)).__of__(self)
+            
             else:
                 return File(id, '', data).__of__(self)
             
