@@ -69,6 +69,9 @@ class CPSArchiveFolder(CPSBaseDocument):
     allow_discussion = 0
     security = ClassSecurityInfo()
 
+    isPrincipiaFolderish = 1
+    ## XXX Check is this is ok
+
     _properties = CPSBaseDocument._properties +\
        ( {'id': 'new_window', 'type': 'boolean', 'mode': 'w',
           'label': 'Open in new window'},
