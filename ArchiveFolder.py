@@ -138,8 +138,8 @@ class CPSArchiveFolder(CPSBaseDocument):
                 return self.wrap_template(id=id)
                 #return self.wrap_template(id=id).__of__(self)
                 # Do not know if __of__ is needed here
-                
-            return File(id, '', data).__of__(self)
+            else:
+                return File(id, '', data).__of__(self)
             
         elif default is _marker:
             raise AttributeError, id
