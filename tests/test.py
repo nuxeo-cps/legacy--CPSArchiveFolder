@@ -51,10 +51,10 @@ class Test(CPSArchiveFolderTestCase.CPSArchiveFolderTestCase):
         self.assert_(len(obj.objectItems()) > 0)
 
         file = obj['coverage.py']
-        self.assert_(isinstance(file, ArchiveFolder.StringWrapperAsObject))
+        self.assert_(file.meta_type == 'File')
 
         file = obj['test.html']
-        self.assert_(isinstance(file, ArchiveFolder.StringWrapperAsObject))
+        self.assert_(file.meta_type == 'File')
 
         self.assertEquals(obj._getOb("no such id", None), None)
         self.assertRaises(AttributeError, obj._getOb, "no such id")
