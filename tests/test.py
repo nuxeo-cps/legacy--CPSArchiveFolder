@@ -51,10 +51,10 @@ class Test(CPSArchiveFolderTestCase.CPSArchiveFolderTestCase):
         self.assert_(len(obj.objectItems()) > 0)
 
         file = obj['coverage.py']
-        self.assert_(file.meta_type == "File")
+        self.assert_(isinstance(file, ArchiveFolder.StringWrapperAsObject))
 
         file = obj['test.html']
-        self.assert_(type(file) == StringType)
+        self.assert_(isinstance(file, ArchiveFolder.StringWrapperAsObject))
 
         self.assertEquals(obj._getOb("no such id", None), None)
         self.assertRaises(AttributeError, obj._getOb, "no such id")
@@ -75,7 +75,7 @@ class Test(CPSArchiveFolderTestCase.CPSArchiveFolderTestCase):
         self.assert_(self.portal.archivefolder_edit)
         self.assert_(self.portal.archivefolder_edit_form)
         self.assert_(self.portal.archivefolder_view)
-        self.assert_(self.portal.wrap_template)
+        self.assert_(self.portal.archivefolder_wrap_template)
 
 def test_suite():
     suite = unittest.TestSuite()
