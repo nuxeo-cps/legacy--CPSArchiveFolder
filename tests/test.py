@@ -12,6 +12,8 @@ import CPSArchiveFolderTestCase
 
 from Products.CPSArchiveFolder import ArchiveFolder
 
+from types import StringType
+
 
 class Test(CPSArchiveFolderTestCase.CPSArchiveFolderTestCase):
     def afterSetUp(self):
@@ -52,7 +54,7 @@ class Test(CPSArchiveFolderTestCase.CPSArchiveFolderTestCase):
         self.assert_(file.meta_type == "File")
 
         file = obj['test.html']
-        self.assert_(file.meta_type == "Page Template")
+        self.assert_(type(file) == StringType)
 
         self.assertEquals(obj._getOb("no such id", None), None)
         self.assertRaises(AttributeError, obj._getOb, "no such id")
