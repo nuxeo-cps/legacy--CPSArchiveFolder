@@ -1,0 +1,57 @@
+<metal:html>
+<metal:body use-macro="here/content_lib/macros/master">
+<metal:header fill-slot="header">
+  <h2>Éditer 
+    <span tal:replace="here/Title">My Title</span></h2>
+</metal:header>
+
+<metal:main fill-slot="main">
+  <form action="archivefolder_edit" method="post" enctype="multipart/form-data"
+        tal:attributes="action string:${here/absolute_url}/archivefolder_edit">
+    <table class="FormLayout">
+      <tr valign="top">
+        <th align="right" i18n:translate="label_title">Title</th>
+        <td colspan="3">
+          <input id="field_focus" type="text" name="title" value="" size="50"
+                 tal:attributes="value here/Title">
+        </td>
+      </tr>
+
+      <tr valign="top">
+        <th align="right">Description</th>
+        <td colspan="3">
+          <textarea name="description:text" rows="5" cols="65" wrap="soft"
+                    tal:content="here/Description">
+          </textarea>
+        </td>
+      </tr>
+
+      <tr valign="top">
+        <th align="right">Fichier Zip</th>
+        <td colspan="3">
+          <input type="file" name="fichier">
+        </td>
+      </tr>
+
+      <tr valign="top">
+        <th align="right">Nouvelle fenêtre</th>
+        <td colspan="3">
+        <input type="checkbox" name="new_window"
+               checked="" 
+               tal:attributes="checked
+                 python:test(here.new_window, 'checked', nothing)">
+        </td>
+      </tr>
+
+      <tr valign="top">
+        <td><br></td>
+        <td>
+          <input type="submit" class="standalone" name="change_and_view"
+            value="button_change_and_view" i18n:attributes="value">
+        </td>
+      </tr>
+    </table>
+  </form>
+</metal:main>
+</metal:body>
+</metal:html>
